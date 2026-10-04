@@ -9,7 +9,7 @@
    security protects your data. NEVER paste the "service_role" key.)
    --------------------------------------------------------------------- */
 const SUPABASE_URL = 'https://ckkawcagzezqzsxbcqqd.supabase.co';
-const SUPABASE_ANON_KEY = 'ckkawcagzezqzsxbcqqd';
+const SUPABASE_ANON_KEY = 'sb_publishable_bawdj0M6KUw0d5cmIEhzzA_Sx_2CE-e';
 
 /* ---------------------------------------------------------------------
    2. SETTINGS: tweak these if you like
