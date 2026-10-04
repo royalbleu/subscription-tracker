@@ -1,163 +1,101 @@
-/* ===== THEME: change colours here ===== */
-:root {
-  --bg: #121316;          /* page background */
-  --surface: #1b1d22;     /* cards, panels */
-  --surface-2: #262930;   /* inputs, hover */
-  --text: #ecebe6;        /* soft off-white */
-  --muted: #9a9ca3;       /* secondary text */
-  --accent: #6fd3b0;      /* the one accent colour */
-  --on-accent: #0d1a15;   /* text on top of accent */
-  --danger: #f2777a;      /* only used for delete */
-  --radius: 16px;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Kirby's Subscription Tracker</title>
 
-* { box-sizing: border-box; }
+  <!-- PWA / home screen settings -->
+  <meta name="theme-color" content="#121316">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon-180.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Subscriptions">
 
-html, body { margin: 0; background: var(--bg); color: var(--text); }
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  font-size: 17px;
-  line-height: 1.4;
-  /* leave room for the pinned totals bar */
-  padding-bottom: calc(130px + env(safe-area-inset-bottom));
-  -webkit-tap-highlight-color: transparent;
-}
+  <!-- ============ LOGIN SCREEN ============ -->
+  <div id="login-view" class="view hidden">
+    <main class="container">
+      <h1>Kirby's Subscription Tracker</h1>
+      <p class="muted">Sign in to see your subscriptions.</p>
+      <form id="login-form">
+        <label>Email
+          <input id="login-email" type="email" autocomplete="email" required>
+        </label>
+        <label>Password
+          <input id="login-password" type="password" autocomplete="current-password" required>
+        </label>
+        <p id="login-error" class="error" role="alert"></p>
+        <button class="btn primary" type="submit">Sign in</button>
+      </form>
+    </main>
+  </div>
 
-h1 { font-size: 24px; margin: 0; }
-h2 { font-size: 20px; margin: 0 0 16px; }
+  <!-- ============ MAIN APP SCREEN ============ -->
+  <div id="app-view" class="view hidden">
+    <header class="container topbar">
+      <h1>Subscriptions</h1>
+      <button id="signout-btn" class="link-btn" type="button">Sign out</button>
+    </header>
 
-.container {
-  width: 100%;
-  max-width: 560px;
-  margin: 0 auto;
-  padding: 0 18px;
-}
+    <main class="container">
+      <button id="add-btn" class="btn primary" type="button">+ Add subscription</button>
+      <ul id="sub-list" class="sub-list"></ul>
+      <p id="status" class="muted center"></p>
+    </main>
 
-.hidden { display: none !important; }
-.muted { color: var(--muted); }
-.center { text-align: center; }
-.error { color: var(--danger); min-height: 1.4em; margin: 4px 0 8px; font-size: 15px; }
+    <!-- Totals bar, pinned to the bottom of the screen -->
+    <footer class="totals">
+      <div class="container">
+        <div class="total-main">
+          <span>Total every 2 weeks:</span>
+          <strong id="total-biweekly">$0.00</strong>
+        </div>
+        <div class="total-sub">
+          <span>Monthly: <b id="total-monthly">$0.00</b></span>
+          <span>Yearly: <b id="total-yearly">$0.00</b></span>
+        </div>
+      </div>
+    </footer>
 
-/* Top bar (respects the iPhone notch / status bar) */
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: calc(env(safe-area-inset-top) + 18px);
-  padding-bottom: 14px;
-}
+    <!-- ============ SLIDE-UP ADD / EDIT PANEL ============ -->
+    <div id="overlay" class="overlay">
+      <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+        <h2 id="sheet-title">Add subscription</h2>
+        <form id="sub-form">
+          <label>Name
+            <input id="f-name" type="text" placeholder="Netflix" maxlength="60" required>
+          </label>
+          <label>Cost (CAD)
+            <input id="f-cost" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0.00" required>
+          </label>
+          <label>Billing frequency
+            <select id="f-frequency">
+              <option value="weekly">Weekly</option>
+              <option value="biweekly">Biweekly</option>
+              <option value="monthly" selected>Monthly</option>
+              <option value="yearly">Yearly</option>
+            </select>
+          </label>
+          <p id="form-error" class="error" role="alert"></p>
+          <div class="sheet-actions">
+            <button id="save-btn" class="btn primary" type="submit">Save</button>
+            <button id="cancel-btn" class="btn" type="button">Cancel</button>
+          </div>
+          <button id="delete-btn" class="btn danger hidden" type="button">Delete</button>
+        </form>
+      </div>
+    </div>
+  </div>
 
-#login-view .container { padding-top: calc(env(safe-area-inset-top) + 60px); }
-#login-view form { margin-top: 24px; }
-
-.link-btn {
-  background: none;
-  border: 0;
-  color: var(--muted);
-  font-size: 15px;
-  min-height: 44px;
-  padding: 0 4px;
-  cursor: pointer;
-}
-
-/* Buttons */
-.btn {
-  display: block;
-  width: 100%;
-  min-height: 54px;
-  border: 0;
-  border-radius: var(--radius);
-  background: var(--surface-2);
-  color: var(--text);
-  font-size: 17px;
-  font-weight: 600;
-  cursor: pointer;
-}
-.btn.primary { background: var(--accent); color: var(--on-accent); }
-.btn.danger { background: transparent; color: var(--muted); margin-top: 10px; }
-.btn.danger.armed { background: var(--danger); color: #1c0b0c; }
-.btn:disabled { opacity: 0.6; }
-
-/* Form fields (16px+ font stops iOS from zooming in) */
-label { display: block; margin-bottom: 14px; color: var(--muted); font-size: 14px; }
-input, select {
-  display: block;
-  width: 100%;
-  min-height: 52px;
-  margin-top: 6px;
-  padding: 0 14px;
-  border: 1px solid transparent;
-  border-radius: 12px;
-  background: var(--surface-2);
-  color: var(--text);
-  font-size: 17px;
-}
-input:focus, select:focus { outline: none; border-color: var(--accent); }
-
-/* Subscription list */
-.sub-list { list-style: none; margin: 16px 0 0; padding: 0; }
-.sub-list li { margin-bottom: 10px; }
-
-.sub-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  width: 100%;
-  min-height: 68px;
-  padding: 12px 16px;
-  border: 0;
-  border-radius: var(--radius);
-  background: var(--surface);
-  color: var(--text);
-  text-align: left;
-  font: inherit;
-  cursor: pointer;
-}
-.sub-item:active { background: var(--surface-2); }
-.sub-name { font-weight: 600; word-break: break-word; }
-.sub-meta { color: var(--muted); font-size: 14px; }
-.sub-right { text-align: right; white-space: nowrap; }
-.sub-biweekly { color: var(--accent); font-weight: 700; }
-.sub-right small { display: block; color: var(--muted); font-size: 12px; }
-
-/* Totals bar pinned to the bottom */
-.totals {
-  position: fixed;
-  left: 0; right: 0; bottom: 0;
-  padding: 14px 0 calc(14px + env(safe-area-inset-bottom));
-  background: var(--surface);
-  border-top: 1px solid var(--surface-2);
-}
-.total-main { display: flex; justify-content: space-between; align-items: baseline; font-size: 18px; }
-.total-main strong { color: var(--accent); font-size: 26px; }
-.total-sub { display: flex; justify-content: space-between; margin-top: 4px; color: var(--muted); font-size: 14px; }
-.total-sub b { color: var(--text); font-weight: 600; }
-
-/* Slide-up panel */
-.overlay {
-  position: fixed;
-  inset: 0;
-  display: none;
-  align-items: flex-end;
-  background: rgba(0, 0, 0, 0.6);
-  z-index: 10;
-}
-.overlay.open { display: flex; }
-
-.sheet {
-  width: 100%;
-  max-width: 560px;
-  margin: 0 auto;
-  padding: 22px 18px calc(22px + env(safe-area-inset-bottom));
-  background: var(--surface);
-  border-radius: 22px 22px 0 0;
-  animation: slide-up 0.2s ease-out;
-}
-.sheet-actions { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; }
-
-@keyframes slide-up {
-  from { transform: translateY(40px); opacity: 0; }
-  to   { transform: translateY(0);    opacity: 1; }
-}
+  <!-- Supabase JS client from a CDN (must load BEFORE app.js) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js"></script>
+</body>
+</html>
