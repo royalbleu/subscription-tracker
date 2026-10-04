@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Icon maker</title>
+  <style>
+    body { font-family: sans-serif; background: #121316; color: #ecebe6; padding: 24px; }
+    button { display: block; margin: 12px 0; padding: 14px 20px; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <h1>Icon maker</h1>
+  <p>Click each button. Save the files into the same folder as your app files.</p>
+  <button onclick="make(180, 'icon-180.png')">Download icon-180.png (iPhone)</button>
+  <button onclick="make(192, 'icon-192.png')">Download icon-192.png (Android)</button>
+  <button onclick="make(512, 'icon-512.png')">Download icon-512.png (Android large)</button>
+
+  <script>
+    // Same artwork as icon.svg. Edit colours here if you change the design.
+    const SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+      <rect width="512" height="512" fill="#121316"/>
+      <circle cx="256" cy="256" r="150" fill="none" stroke="#6fd3b0" stroke-width="22"/>
+      <text x="256" y="312" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"
+            font-size="190" font-weight="700" fill="#ecebe6">$</text>
+    </svg>`;
+
+    function make(size, filename) {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = canvas.height = size;
+        canvas.getContext('2d').drawImage(img, 0, 0, size, size);
+        canvas.toBlob((blob) => {
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = filename;
+          a.click();
+        }, 'image/png');
+      };
+      img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(SVG);
+    }
+  </script>
+</body>
+</html>

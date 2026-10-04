@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Kirby's Subscription Tracker</title>
+
+  <!-- PWA / home screen settings -->
+  <meta name="theme-color" content="#121316">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon-180.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Subscriptions">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ============ LOGIN SCREEN ============ -->
+  <div id="login-view" class="view hidden">
+    <main class="container">
+      <h1>Kirby's Subscription Tracker</h1>
+      <p class="muted">Sign in to see your subscriptions.</p>
+      <form id="login-form">
+        <label>Email
+          <input id="login-email" type="email" autocomplete="email" required>
+        </label>
+        <label>Password
+          <input id="login-password" type="password" autocomplete="current-password" required>
+        </label>
+        <p id="login-error" class="error" role="alert"></p>
+        <button class="btn primary" type="submit">Sign in</button>
+      </form>
+    </main>
+  </div>
+
+  <!-- ============ MAIN APP SCREEN ============ -->
+  <div id="app-view" class="view hidden">
+    <header class="container topbar">
+      <h1>Subscriptions</h1>
+      <button id="signout-btn" class="link-btn" type="button">Sign out</button>
+    </header>
+
+    <main class="container">
+      <button id="add-btn" class="btn primary" type="button">+ Add subscription</button>
+      <ul id="sub-list" class="sub-list"></ul>
+      <p id="status" class="muted center"></p>
+    </main>
+
+    <!-- Totals bar, pinned to the bottom of the screen -->
+    <footer class="totals">
+      <div class="container">
+        <div class="total-main">
+          <span>Total every 2 weeks:</span>
+          <strong id="total-biweekly">$0.00</strong>
+        </div>
+        <div class="total-sub">
+          <span>Monthly: <b id="total-monthly">$0.00</b></span>
+          <span>Yearly: <b id="total-yearly">$0.00</b></span>
+        </div>
+      </div>
+    </footer>
+
+    <!-- ============ SLIDE-UP ADD / EDIT PANEL ============ -->
+    <div id="overlay" class="overlay">
+      <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+        <h2 id="sheet-title">Add subscription</h2>
+        <form id="sub-form">
+          <label>Name
+            <input id="f-name" type="text" placeholder="Netflix" maxlength="60" required>
+          </label>
+          <label>Cost (CAD)
+            <input id="f-cost" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0.00" required>
+          </label>
+          <label>Billing frequency
+            <select id="f-frequency">
+              <option value="weekly">Weekly</option>
+              <option value="biweekly">Biweekly</option>
+              <option value="monthly" selected>Monthly</option>
+              <option value="yearly">Yearly</option>
+            </select>
+          </label>
+          <p id="form-error" class="error" role="alert"></p>
+          <div class="sheet-actions">
+            <button id="save-btn" class="btn primary" type="submit">Save</button>
+            <button id="cancel-btn" class="btn" type="button">Cancel</button>
+          </div>
+          <button id="delete-btn" class="btn danger hidden" type="button">Delete</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase JS client from a CDN (must load BEFORE app.js) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js"></script>
+</body>
+</html>
